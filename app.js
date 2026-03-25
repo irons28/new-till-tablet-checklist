@@ -245,6 +245,7 @@ function renderChecklist() {
     const details = node.querySelector(".step-details");
     const instructionList = node.querySelector(".step-instructions");
     const illustration = node.querySelector(".step-illustration");
+    const illustrationLabel = node.querySelector(".step-illustration__label");
 
     checkbox.checked = Boolean(progress[step.id]);
     checkbox.addEventListener("change", () => toggleStep(step.id, checkbox.checked));
@@ -257,13 +258,17 @@ function renderChecklist() {
         ? "Till"
         : "Tablet";
 
-    const fallbackIllustration = sectionIllustrations[section.id] || sectionIllustrations.core;
+    illustration.dataset.section = section.id;
+    illustrationLabel.textContent = section.section;
+    illustration.style.backgroundImage = "";
     const screenshotCandidate = `assets/screenshots/${step.id}.png`;
-    illustration.src = fallbackIllustration;
-    illustration.alt = `${step.title} screenshot or illustration`;
     const probe = new Image();
     probe.onload = () => {
-      illustration.src = screenshotCandidate;
+      illustration.style.backgroundImage = `url(${screenshotCandidate})`;
+      illustration.classList.add("has-real-screenshot");
+    };
+    probe.onerror = () => {
+      illustration.classList.remove("has-real-screenshot");
     };
     probe.src = screenshotCandidate;
 

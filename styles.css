@@ -329,9 +329,45 @@ h1 {
 
 .step-illustration {
   width: 100%;
+  min-height: 190px;
+  aspect-ratio: 16 / 9;
   border: 1px solid rgba(15, 118, 110, 0.2);
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(255, 255, 255, 0.7));
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(255, 255, 255, 0.82)),
+    radial-gradient(circle at top right, rgba(217, 119, 6, 0.16), transparent 32%),
+    #f7f3ec;
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.step-illustration__label {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+
+.step-illustration__hint {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.step-illustration.has-real-screenshot {
+  place-items: end start;
+}
+
+.step-illustration.has-real-screenshot .step-illustration__label,
+.step-illustration.has-real-screenshot .step-illustration__hint {
+  background: rgba(255, 250, 243, 0.88);
+  padding: 8px 10px;
+  border-radius: 12px;
 }
 
 .step-details {

@@ -244,8 +244,8 @@ function renderChecklist() {
     const expandButton = node.querySelector(".expand-button");
     const details = node.querySelector(".step-details");
     const instructionList = node.querySelector(".step-instructions");
-    const illustration = node.querySelector(".step-illustration");
-    const illustrationLabel = node.querySelector(".step-illustration__label");
+    const previewCard = node.querySelector(".step-preview-card");
+    const previewTitle = node.querySelector(".step-preview-card__title");
 
     checkbox.checked = Boolean(progress[step.id]);
     checkbox.addEventListener("change", () => toggleStep(step.id, checkbox.checked));
@@ -258,39 +258,8 @@ function renderChecklist() {
         ? "Till"
         : "Tablet";
 
-    illustration.dataset.section = section.id;
-    illustrationLabel.textContent = section.section;
-    illustration.style.minHeight = "190px";
-    illustration.style.aspectRatio = "16 / 9";
-    illustration.style.border = "1px solid rgba(15, 118, 110, 0.2)";
-    illustration.style.borderRadius = "16px";
-    illustration.style.padding = "20px";
-    illustration.style.display = "grid";
-    illustration.style.placeItems = "center";
-    illustration.style.textAlign = "center";
-    illustration.style.background = "linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(255, 255, 255, 0.82)), radial-gradient(circle at top right, rgba(217, 119, 6, 0.16), transparent 32%), #f7f3ec";
-    illustration.style.backgroundSize = "cover";
-    illustration.style.backgroundPosition = "center";
-    const screenshotCandidates = [`assets/screenshots/${step.id}.png`, `assets/screenshots/${step.id}.svg`];
-    const tryScreenshot = (index = 0) => {
-      if (index >= screenshotCandidates.length) {
-        illustration.style.backgroundImage = "";
-        illustration.classList.remove("has-real-screenshot");
-        return;
-      }
-      const candidate = screenshotCandidates[index];
-      const probe = new Image();
-      probe.onload = () => {
-        illustration.style.backgroundImage = `url(${candidate})`;
-        illustration.style.placeItems = "end start";
-        illustration.classList.add("has-real-screenshot");
-      };
-      probe.onerror = () => {
-        tryScreenshot(index + 1);
-      };
-      probe.src = candidate;
-    };
-    tryScreenshot();
+    previewCard.dataset.section = section.id;
+    previewTitle.textContent = step.title;
 
     step.instructions.forEach((instruction) => {
       const li = document.createElement("li");

@@ -257,8 +257,13 @@ function renderChecklist() {
         ? "Till"
         : "Tablet";
 
-    illustration.src = sectionIllustrations[section.id] || sectionIllustrations.core;
-    illustration.alt = `${section.section} illustration`;
+    const fallbackIllustration = sectionIllustrations[section.id] || sectionIllustrations.core;
+    illustration.src = `assets/screenshots/${step.id}.png`;
+    illustration.alt = `${step.title} screenshot or illustration`;
+    illustration.onerror = () => {
+      illustration.onerror = null;
+      illustration.src = fallbackIllustration;
+    };
 
     step.instructions.forEach((instruction) => {
       const li = document.createElement("li");

@@ -45,6 +45,16 @@ const metaEngineer = document.getElementById("meta-engineer");
 const metaDate = document.getElementById("meta-date");
 const metaInputs = [metaStore, metaDeviceNames, metaEngineer, metaDate];
 
+function previewVariant(stepId) {
+  if (stepId.includes("update")) return "updates";
+  if (stepId.includes("rename") || stepId.includes("device-name")) return "rename";
+  if (stepId.includes("rdp") || stepId.includes("logmein")) return "remote";
+  if (stepId.includes("printer")) return "printer";
+  if (stepId.includes("tablet")) return "tablet";
+  if (stepId.includes("user")) return "users";
+  return "default";
+}
+
 function progressKey() {
   return `setup-guide:progress:${state.device}`;
 }
@@ -245,7 +255,9 @@ function renderChecklist() {
     const details = node.querySelector(".step-details");
     const instructionList = node.querySelector(".step-instructions");
     const previewCard = node.querySelector(".step-preview-card");
+    const previewWindow = node.querySelector(".step-preview-card__window");
     const previewTitle = node.querySelector(".step-preview-card__title");
+    const previewChip = node.querySelector(".step-preview-card__chip");
 
     checkbox.checked = Boolean(progress[step.id]);
     checkbox.addEventListener("change", () => toggleStep(step.id, checkbox.checked));
@@ -259,7 +271,27 @@ function renderChecklist() {
         : "Tablet";
 
     previewCard.dataset.section = section.id;
+    previewCard.dataset.variant = previewVariant(step.id);
     previewTitle.textContent = step.title;
+    previewChip.style.width = `${72 + (step.title.length % 4) * 18}px`;
+    previewWindow.style.backgroundImage = "";
+    previewWindow.classList.remove("has-real-screenshot");
+
+    const screenshotCandidates = [`assets/screenshots/${step.id}.png`, `assets/screenshots/${step.id}.svg`];
+    const tryScreenshot = (index = 0) => {
+      if (index >= screenshotCandidates.length) return;
+      const candidate = screenshotCandidates[index];
+      const probe = new Image();
+      probe.onload = () => {
+        previewWindow.style.backgroundImage = `url(${candidate})`;
+        previewWindow.style.backgroundSize = "cover";
+        previewWindow.style.backgroundPosition = "center";
+        previewWindow.classList.add("has-real-screenshot");
+      };
+      probe.onerror = () => tryScreenshot(index + 1);
+      probe.src = candidate;
+    };
+    tryScreenshot();
 
     step.instructions.forEach((instruction) => {
       const li = document.createElement("li");

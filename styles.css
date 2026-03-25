@@ -331,12 +331,34 @@ h1 {
   width: min(100%, 360px);
 }
 
+.step-preview-card[data-variant="updates"] .step-preview-card__toolbar,
+.step-preview-card[data-variant="remote"] .step-preview-card__toolbar {
+  background: linear-gradient(90deg, #d9e8f2, #eef5f9);
+}
+
+.step-preview-card[data-variant="printer"] .step-preview-card__toolbar,
+.step-preview-card[data-variant="rename"] .step-preview-card__toolbar {
+  background: linear-gradient(90deg, #efe4d5, #f8f1e8);
+}
+
+.step-preview-card[data-variant="tablet"] .step-preview-card__toolbar {
+  background: linear-gradient(90deg, #dde7df, #eff5f1);
+}
+
+.step-preview-card[data-variant="users"] .step-preview-card__toolbar {
+  background: linear-gradient(90deg, #e7e2f3, #f4f1fa);
+}
+
 .step-preview-card__window {
   border: 1px solid rgba(15, 118, 110, 0.18);
   border-radius: 16px;
   overflow: hidden;
   background: #fbfaf6;
   box-shadow: 0 10px 24px rgba(28, 26, 23, 0.08);
+}
+
+.step-preview-card__window.has-real-screenshot .step-preview-card__body {
+  opacity: 0;
 }
 
 .step-preview-card__toolbar {
@@ -392,12 +414,6 @@ h1 {
 
 .step-preview-card__panel-line {
   margin-bottom: 8px;
-}
-
-.step-preview-card__caption {
-  margin-top: 8px;
-  font-size: 0.92rem;
-  color: var(--muted);
 }
 
 .step-details {

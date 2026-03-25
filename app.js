@@ -271,18 +271,26 @@ function renderChecklist() {
     illustration.style.background = "linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(255, 255, 255, 0.82)), radial-gradient(circle at top right, rgba(217, 119, 6, 0.16), transparent 32%), #f7f3ec";
     illustration.style.backgroundSize = "cover";
     illustration.style.backgroundPosition = "center";
-    const screenshotCandidate = `assets/screenshots/${step.id}.png`;
-    const probe = new Image();
-    probe.onload = () => {
-      illustration.style.backgroundImage = `url(${screenshotCandidate})`;
-      illustration.style.placeItems = "end start";
-      illustration.classList.add("has-real-screenshot");
+    const screenshotCandidates = [`assets/screenshots/${step.id}.png`, `assets/screenshots/${step.id}.svg`];
+    const tryScreenshot = (index = 0) => {
+      if (index >= screenshotCandidates.length) {
+        illustration.style.backgroundImage = "";
+        illustration.classList.remove("has-real-screenshot");
+        return;
+      }
+      const candidate = screenshotCandidates[index];
+      const probe = new Image();
+      probe.onload = () => {
+        illustration.style.backgroundImage = `url(${candidate})`;
+        illustration.style.placeItems = "end start";
+        illustration.classList.add("has-real-screenshot");
+      };
+      probe.onerror = () => {
+        tryScreenshot(index + 1);
+      };
+      probe.src = candidate;
     };
-    probe.onerror = () => {
-      illustration.style.backgroundImage = "";
-      illustration.classList.remove("has-real-screenshot");
-    };
-    probe.src = screenshotCandidate;
+    tryScreenshot();
 
     step.instructions.forEach((instruction) => {
       const li = document.createElement("li");

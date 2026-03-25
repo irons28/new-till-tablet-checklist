@@ -85,6 +85,43 @@ img {
   padding: 22px;
 }
 
+.brand-lockup {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.brand-lockup__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.brand-lockup__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  height: 44px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(28, 26, 23, 0.08);
+}
+
+.brand-lockup__logo--dark {
+  background: #173a37;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.brand-lockup__logo img {
+  max-width: 100%;
+  max-height: 24px;
+}
+
 .eyebrow,
 .section-label {
   text-transform: uppercase;

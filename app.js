@@ -3,6 +3,14 @@ const state = {
   currentSectionId: null
 };
 
+const sectionIllustrations = {
+  core: "assets/illustrations/core-system.svg",
+  software: "assets/illustrations/software-setup.svg",
+  printer: "assets/illustrations/printer-setup.svg",
+  tablet: "assets/illustrations/tablet-config.svg",
+  "final-checks": "assets/illustrations/final-checks.svg"
+};
+
 const sectionNav = document.getElementById("section-nav");
 const pitfallsList = document.getElementById("pitfalls-list");
 const checklist = document.getElementById("checklist");
@@ -17,13 +25,25 @@ const sectionTitle = document.getElementById("section-title");
 const sectionDescription = document.getElementById("section-description");
 const sectionCount = document.getElementById("section-count");
 const summaryDevice = document.getElementById("summary-device");
+const summaryStore = document.getElementById("summary-store");
+const summaryDeviceName = document.getElementById("summary-device-name");
+const summaryEngineer = document.getElementById("summary-engineer");
+const summaryDate = document.getElementById("summary-date");
 const summaryCompleted = document.getElementById("summary-completed");
 const summaryRemaining = document.getElementById("summary-remaining");
+const summaryStatus = document.getElementById("summary-status");
 const completionState = document.getElementById("completion-state");
+const completionChecks = document.getElementById("completion-checks");
 const setupNotes = document.getElementById("setup-notes");
 const printButton = document.getElementById("print-button");
+const copyButton = document.getElementById("copy-button");
 const resetButton = document.getElementById("reset-button");
 const deviceButtons = document.querySelectorAll(".device-button");
+const metaStore = document.getElementById("meta-store");
+const metaDeviceName = document.getElementById("meta-device-name");
+const metaEngineer = document.getElementById("meta-engineer");
+const metaDate = document.getElementById("meta-date");
+const metaInputs = [metaStore, metaDeviceName, metaEngineer, metaDate];
 
 function progressKey() {
   return `setup-guide:progress:${state.device}`;
@@ -31,6 +51,10 @@ function progressKey() {
 
 function notesKey() {
   return `setup-guide:notes:${state.device}`;
+}
+
+function metaKey() {
+  return `setup-guide:meta:${state.device}`;
 }
 
 function getSavedProgress() {
@@ -43,6 +67,18 @@ function getSavedProgress() {
 
 function saveProgress(progress) {
   localStorage.setItem(progressKey(), JSON.stringify(progress));
+}
+
+function getSavedMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(metaKey()) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveMeta(meta) {
+  localStorage.setItem(metaKey(), JSON.stringify(meta));
 }
 
 function getSectionsForDevice() {
@@ -62,6 +98,22 @@ function getAllSteps() {
 function getCurrentSection() {
   const sections = getSectionsForDevice();
   return sections.find((section) => section.id === state.currentSectionId) || sections[0];
+}
+
+function getCompletionChecks() {
+  return state.device === "till"
+    ? [
+        "Printer working and mapped to the correct USB port",
+        "Auto login verified after restart",
+        "NIC and USB power saving disabled",
+        "Remote support tools working"
+      ]
+    : [
+        "Rotation lock confirmed",
+        "Tablet mode disabled where required",
+        "Brightness adjusted for site use",
+        "Bluetooth disabled if not needed"
+      ];
 }
 
 function updateHero() {
@@ -103,6 +155,40 @@ function renderSectionNav() {
   });
 }
 
+function loadMeta() {
+  const meta = getSavedMeta();
+  metaStore.value = meta.store || "";
+  metaDeviceName.value = meta.deviceName || "";
+  metaEngineer.value = meta.engineer || "";
+  metaDate.value = meta.date || "";
+}
+
+function currentMeta() {
+  return {
+    store: metaStore.value.trim(),
+    deviceName: metaDeviceName.value.trim(),
+    engineer: metaEngineer.value.trim(),
+    date: metaDate.value
+  };
+}
+
+function updateMetaSummary() {
+  const meta = currentMeta();
+  summaryStore.textContent = meta.store || "Not set";
+  summaryDeviceName.textContent = meta.deviceName || "Not set";
+  summaryEngineer.textContent = meta.engineer || "Not set";
+  summaryDate.textContent = meta.date || "Not set";
+}
+
+function renderCompletionChecks() {
+  completionChecks.innerHTML = "";
+  getCompletionChecks().forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    completionChecks.appendChild(li);
+  });
+}
+
 function updateProgressSummary() {
   const progress = getSavedProgress();
   const steps = getAllSteps();
@@ -110,23 +196,23 @@ function updateProgressSummary() {
   const total = steps.length;
   const remaining = Math.max(total - completed, 0);
   const percent = total ? Math.round((completed / total) * 100) : 0;
+  const isComplete = completed === total && total > 0;
 
   progressCount.textContent = completed;
   progressTotal.textContent = total;
   progressFill.style.width = `${percent}%`;
-  progressMessage.textContent =
-    completed === total && total > 0
-      ? "Everything is complete. Add final notes or print the summary."
-      : `${percent}% complete for the ${state.device} workflow.`;
+  progressMessage.textContent = isComplete
+    ? "Everything is complete. Review the handover summary and print or copy it if needed."
+    : `${percent}% complete for the ${state.device} workflow.`;
 
   summaryCompleted.textContent = String(completed);
   summaryRemaining.textContent = String(remaining);
-  completionState.textContent =
-    completed === total && total > 0
-      ? "Ready for handover. Review notes and print if needed."
-      : "Complete all visible steps to unlock the summary.";
-  completionState.classList.toggle("is-complete", completed === total && total > 0);
-  completionState.classList.toggle("is-pending", !(completed === total && total > 0));
+  summaryStatus.textContent = isComplete ? "Ready for handover" : "In progress";
+  completionState.textContent = isComplete
+    ? "Ready for handover. Review notes, copy the summary, or print it for sign-off."
+    : "Complete all visible steps to unlock the summary.";
+  completionState.classList.toggle("is-complete", isComplete);
+  completionState.classList.toggle("is-pending", !isComplete);
 }
 
 function toggleStep(stepId, checked) {
@@ -158,14 +244,21 @@ function renderChecklist() {
     const expandButton = node.querySelector(".expand-button");
     const details = node.querySelector(".step-details");
     const instructionList = node.querySelector(".step-instructions");
+    const illustration = node.querySelector(".step-illustration");
 
     checkbox.checked = Boolean(progress[step.id]);
     checkbox.addEventListener("change", () => toggleStep(step.id, checkbox.checked));
 
     node.querySelector(".step-title").textContent = step.title;
     node.querySelector(".step-summary").textContent = step.summary;
-    node.querySelector(".step-badge").textContent =
-      step.device.length === 2 ? "All devices" : step.device[0] === "till" ? "Till" : "Tablet";
+    node.querySelector(".step-badge").textContent = step.device.length === 2
+      ? "All devices"
+      : step.device[0] === "till"
+        ? "Till"
+        : "Tablet";
+
+    illustration.src = sectionIllustrations[section.id] || sectionIllustrations.core;
+    illustration.alt = `${section.section} illustration`;
 
     step.instructions.forEach((instruction) => {
       const li = document.createElement("li");
@@ -188,6 +281,21 @@ function loadNotes() {
   setupNotes.value = localStorage.getItem(notesKey()) || "";
 }
 
+function buildSummaryText() {
+  const meta = currentMeta();
+  return [
+    `${state.device === "till" ? "Till" : "Tablet"} setup summary`,
+    `Store: ${meta.store || "Not set"}`,
+    `Device name: ${meta.deviceName || "Not set"}`,
+    `Engineer: ${meta.engineer || "Not set"}`,
+    `Setup date: ${meta.date || "Not set"}`,
+    `Completed steps: ${summaryCompleted.textContent}`,
+    `Remaining: ${summaryRemaining.textContent}`,
+    `Status: ${summaryStatus.textContent}`,
+    `Notes: ${setupNotes.value.trim() || "None"}`
+  ].join("\n");
+}
+
 function render() {
   deviceButtons.forEach((button) => {
     button.classList.toggle("active", button.dataset.device === state.device);
@@ -195,6 +303,9 @@ function render() {
   updateHero();
   renderPitfalls();
   renderSectionNav();
+  loadMeta();
+  updateMetaSummary();
+  renderCompletionChecks();
   renderChecklist();
   loadNotes();
   updateProgressSummary();
@@ -208,6 +319,13 @@ deviceButtons.forEach((button) => {
   });
 });
 
+metaInputs.forEach((input) => {
+  input.addEventListener("input", () => {
+    saveMeta(currentMeta());
+    updateMetaSummary();
+  });
+});
+
 setupNotes.addEventListener("input", () => {
   localStorage.setItem(notesKey(), setupNotes.value);
 });
@@ -216,9 +334,26 @@ printButton.addEventListener("click", () => {
   window.print();
 });
 
+copyButton.addEventListener("click", async () => {
+  const summaryText = buildSummaryText();
+  try {
+    await navigator.clipboard.writeText(summaryText);
+    copyButton.textContent = "Copied";
+    setTimeout(() => {
+      copyButton.textContent = "Copy summary";
+    }, 1600);
+  } catch {
+    copyButton.textContent = "Copy failed";
+    setTimeout(() => {
+      copyButton.textContent = "Copy summary";
+    }, 1600);
+  }
+});
+
 resetButton.addEventListener("click", () => {
   localStorage.removeItem(progressKey());
   localStorage.removeItem(notesKey());
+  localStorage.removeItem(metaKey());
   render();
 });
 

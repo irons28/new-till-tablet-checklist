@@ -260,14 +260,26 @@ function renderChecklist() {
 
     illustration.dataset.section = section.id;
     illustrationLabel.textContent = section.section;
-    illustration.style.backgroundImage = "";
+    illustration.style.minHeight = "190px";
+    illustration.style.aspectRatio = "16 / 9";
+    illustration.style.border = "1px solid rgba(15, 118, 110, 0.2)";
+    illustration.style.borderRadius = "16px";
+    illustration.style.padding = "20px";
+    illustration.style.display = "grid";
+    illustration.style.placeItems = "center";
+    illustration.style.textAlign = "center";
+    illustration.style.background = "linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(255, 255, 255, 0.82)), radial-gradient(circle at top right, rgba(217, 119, 6, 0.16), transparent 32%), #f7f3ec";
+    illustration.style.backgroundSize = "cover";
+    illustration.style.backgroundPosition = "center";
     const screenshotCandidate = `assets/screenshots/${step.id}.png`;
     const probe = new Image();
     probe.onload = () => {
       illustration.style.backgroundImage = `url(${screenshotCandidate})`;
+      illustration.style.placeItems = "end start";
       illustration.classList.add("has-real-screenshot");
     };
     probe.onerror = () => {
+      illustration.style.backgroundImage = "";
       illustration.classList.remove("has-real-screenshot");
     };
     probe.src = screenshotCandidate;

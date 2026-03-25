@@ -26,7 +26,7 @@ const sectionDescription = document.getElementById("section-description");
 const sectionCount = document.getElementById("section-count");
 const summaryDevice = document.getElementById("summary-device");
 const summaryStore = document.getElementById("summary-store");
-const summaryDeviceName = document.getElementById("summary-device-name");
+const summaryDeviceNames = document.getElementById("summary-device-names");
 const summaryEngineer = document.getElementById("summary-engineer");
 const summaryDate = document.getElementById("summary-date");
 const summaryCompleted = document.getElementById("summary-completed");
@@ -40,10 +40,10 @@ const copyButton = document.getElementById("copy-button");
 const resetButton = document.getElementById("reset-button");
 const deviceButtons = document.querySelectorAll(".device-button");
 const metaStore = document.getElementById("meta-store");
-const metaDeviceName = document.getElementById("meta-device-name");
+const metaDeviceNames = document.getElementById("meta-device-names");
 const metaEngineer = document.getElementById("meta-engineer");
 const metaDate = document.getElementById("meta-date");
-const metaInputs = [metaStore, metaDeviceName, metaEngineer, metaDate];
+const metaInputs = [metaStore, metaDeviceNames, metaEngineer, metaDate];
 
 function progressKey() {
   return `setup-guide:progress:${state.device}`;
@@ -158,7 +158,7 @@ function renderSectionNav() {
 function loadMeta() {
   const meta = getSavedMeta();
   metaStore.value = meta.store || "";
-  metaDeviceName.value = meta.deviceName || "";
+  metaDeviceNames.value = meta.deviceNames || "";
   metaEngineer.value = meta.engineer || "";
   metaDate.value = meta.date || "";
 }
@@ -166,7 +166,7 @@ function loadMeta() {
 function currentMeta() {
   return {
     store: metaStore.value.trim(),
-    deviceName: metaDeviceName.value.trim(),
+    deviceNames: metaDeviceNames.value.trim(),
     engineer: metaEngineer.value.trim(),
     date: metaDate.value
   };
@@ -175,7 +175,7 @@ function currentMeta() {
 function updateMetaSummary() {
   const meta = currentMeta();
   summaryStore.textContent = meta.store || "Not set";
-  summaryDeviceName.textContent = meta.deviceName || "Not set";
+  summaryDeviceNames.textContent = meta.deviceNames || "Not set";
   summaryEngineer.textContent = meta.engineer || "Not set";
   summaryDate.textContent = meta.date || "Not set";
 }
@@ -293,7 +293,7 @@ function buildSummaryText() {
   return [
     `${state.device === "till" ? "Till" : "Tablet"} setup summary`,
     `Store: ${meta.store || "Not set"}`,
-    `Device name: ${meta.deviceName || "Not set"}`,
+    `Device names: ${meta.deviceNames || "Not set"}`,
     `Engineer: ${meta.engineer || "Not set"}`,
     `Setup date: ${meta.date || "Not set"}`,
     `Completed steps: ${summaryCompleted.textContent}`,
